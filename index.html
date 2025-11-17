@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>귀멸의 칼날 아로마 설문 테스트</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap");
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui,
+          BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #111;
+        color: #fff;
+        overflow: hidden;
+      }
+
+      .screen {
+        display: none;
+        min-height: 100vh;
+        width: 100vw;
+        padding: 24px;
+        position: relative;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .screen.active {
+        display: flex;
+      }
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+      }
+
+      .content {
+        position: relative;
+        margin: auto;
+        max-width: 960px;
+        width: 100%;
+        text-align: center;
+        z-index: 2;
+      }
+
+      .title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 2.4rem;
+        line-height: 1.6;
+      }
+
+      .name-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        font-size: 1.2rem;
+        border: 3px solid white;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+      }
+      .name-input:focus {
+        outline: none;
+        background: white;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 28px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(135deg, #ff5f6d, #ffc371);
+        color: #111;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        transition: transform 0.15s ease, box-shadow 0.15s ease,
+          filter 0.15s ease;
+        margin-top: 8px;
+      }
+
+      .button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+        filter: brightness(1.05);
+      }
+
+      .button:active {
+        transform: translateY(0px) scale(0.99);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+        filter: brightness(0.98);
+      }
+
+      .question-box {
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 24px;
+        padding: 24px 22px 26px;
+        max-width: 840px;
+        margin: 0 auto 24px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        gap: 12px;
+      }
+
+      .question-progress {
+        font-size: 0.9rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+
+      .question-text {
+        font-size: 1.3rem;
+        font-weight: 700;
+        text-align: left;
+      }
+
+      .progress-bar-wrap {
+        width: 100%;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.12);
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #ff5f6d, #ffc371);
+        transition: width 0.3s ease;
+      }
+
+      .answers {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        margin-top: 4px;
+      }
+
+      @media (min-width: 720px) {
+        .answers {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .answer-btn {
+        text-align: left;
+        padding: 12px 16px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+        font-size: 0.98rem;
+        line-height: 1.5;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        transition: background 0.15s ease, transform 0.1s ease,
+          box-shadow 0.15s ease, border-color 0.15s ease;
+      }
+
+      .answer-btn-label {
+        font-weight: 700;
+        opacity: 0.9;
+        flex-shrink: 0;
+        color: #ffffff;
+      }
+
+      .answer-btn-text {
+        opacity: 0.92;
+        color: #ffffff;
+      }
+
+      .answer-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+
+      .answer-btn:active {
+        transform: translateY(0);
+        box-shadow: none;
+      }
+
+      .result-card {
+        max-width: 720px;
+        margin: 0 auto;
+        background: rgba(0, 0, 0, 0.65);
+        border-radius: 32px;
+        padding: 28px 24px 30px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(14px);
+      }
+
+      .result-header {
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+        opacity: 0.95;
+      }
+
+      .user-name-highlight {
+        font-weight: 800;
+        font-size: 1.25rem;
+      }
+
+      .character-name {
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 6px 0 2px;
+      }
+
+      .character-tagline {
+        font-size: 0.95rem;
+        opacity: 0.85;
+        margin-bottom: 18px;
+      }
+
+      .character-image {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.85);
+        margin-bottom: 16px;
+      }
+
+      .aroma-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.86rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .aroma-badge span {
+        font-size: 1.1rem;
+      }
+
+      .aroma-type {
+        font-size: 0.9rem;
+        opacity: 0.88;
+        margin-bottom: 10px;
+      }
+
+      .result-description {
+        font-size: 0.97rem;
+        line-height: 1.7;
+        text-align: left;
+        margin-top: 8px;
+        opacity: 0.95;
+      }
+
+      .retry-btn {
+        margin-top: 24px;
+        background: rgba(255, 255, 255, 0.94);
+        color: #111;
+        padding-inline: 24px;
+      }
+
+      .retry-btn:hover {
+        background: #fff;
+      }
+
+      /* 배경 이미지 지정 */
+      #startScreen {
+        background-image: url("startbg.jpg");
+      }
+
+      #questionScreen {
+        background-image: url("quesBg.jpg");
+      }
+
+      .tanjiro {
+        background-image: url("quesBg.jpg");
+      }
+      .zenitsu {
+        background-image: url("quesBg.jpg");
+      }
+      .nezuko {
+        background-image: url("quesBg.jpg");
+      }
+      .inosuke {
+        background-image: url("quesBg.jpg");
+      }
+      .mitsuri {
+        background-image: url("quesBg.jpg");
+      }
+      .giyu {
+        background-image: url("quesBg.jpg");
+      }
+
+      .tanjiro .character-name {
+        color: #7fd87a;
+      }
+      .zenitsu .character-name {
+        color: #ffd75f;
+      }
+      .nezuko .character-name {
+        color: #ff8fb1;
+      }
+      .inosuke .character-name {
+        color: #7cd0ff;
+      }
+      .mitsuri .character-name {
+        color: #ff92c2;
+      }
+      .giyu .character-name {
+        color: #7aa7ff;
+      }
+
+      .tanjiro .aroma-badge {
+        background: rgba(88, 177, 120, 0.16);
+        border: 1px solid rgba(127, 216, 122, 0.6);
+      }
+      .zenitsu .aroma-badge {
+        background: rgba(255, 215, 95, 0.16);
+        border: 1px solid rgba(255, 215, 95, 0.7);
+      }
+      .nezuko .aroma-badge {
+        background: rgba(255, 143, 177, 0.16);
+        border: 1px solid rgba(255, 143, 177, 0.7);
+      }
+      .inosuke .aroma-badge {
+        background: rgba(124, 208, 255, 0.16);
+        border: 1px solid rgba(124, 208, 255, 0.7);
+      }
+      .mitsuri .aroma-badge {
+        background: rgba(255, 146, 194, 0.16);
+        border: 1px solid rgba(255, 146, 194, 0.7);
+      }
+      .giyu .aroma-badge {
+        background: rgba(122, 167, 255, 0.16);
+        border: 1px solid rgba(122, 167, 255, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 시작 화면 -->
+    <div id="startScreen" class="screen active">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="title">나의 귀멸 성향으로 고르는 아로마 테라피</div>
+        <div class="subtitle">
+          요즘 나를 가장 힘들게 하는 스트레스는 어디에서 올까?<br />
+          간단한 테스트로 내 스트레스 패턴을 체크하고,<br />
+          나에게 꼭 맞는
+          <strong>귀멸의 칼날 캐릭터 × 아로마 향</strong>을 추천받아보자.
+        </div>
+        <input
+          type="text"
+          id="userName"
+          class="name-input"
+          placeholder="이름을 입력해 주세요"
+        />
+        <br />
+        <button class="button" onclick="startQuiz()">테스트 시작하기</button>
+      </div>
+    </div>
+
+    <!-- 질문 화면 -->
+    <div id="questionScreen" class="screen">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="question-box">
+          <div class="question-header">
+            <div class="question-progress" id="questionProgress"></div>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBar"></div>
+          </div>
+          <div class="question-text" id="questionText"></div>
+        </div>
+
+        <div class="answers" id="answersContainer"></div>
+      </div>
+    </div>
+
+    <!-- 결과 화면: 탄지로 -->
+    <div id="resultTanjiro" class="screen result-screen tanjiro">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="result-card">
+          <img src="탄지로.webp" alt="탄지로" class="character-image" />
+          <div class="result-header">
+            <span class="user-name-highlight" id="userNameTanjiro"></span>님의
+            스트레스 타입은
+          </div>
+          <div class="character-name">탄지로 타입</div>
+          <div class="character-tagline">
+            흔들리지 않고 목표를 향해 나아가고 싶은, 꾸준한 몰입형 스트레스 타입
+          </div>
+          <div class="aroma-badge">
+            <span>🌿</span>
+            <span>로즈마리 (Rosemary)</span>
+          </div>
+          <div class="aroma-type">집중력 향상 · 공부/작업 몰입용</div>
+          <div class="result-description">
+            해야 할 일은 많은데, 머리가 자꾸 산만해지고 집중이 흐트러지는
+            편인가요? 로즈마리 향은 뇌를 깨우기보다는, 차분하게 한 가지 일에
+            오래 몰입할 수 있도록 도와주는 향입니다. 시험 공부, 프로젝트, 업무
+            정리 등 장기적인 집중이 필요한 당신에게 잘 어울립니다. 탄지로 타입인
+            당신은 한 번 마음먹은 일은 끝까지 해내는 꾸준한 스타일이에요. 다만,
+            피로가 쌓이면 집중력이 급격히 떨어질 수 있어, 로즈마리 향으로 집중의
+            흐름을 다시 잡아주는 테라피가 도움이 됩니다.
+          </div>
+          <button class="button retry-btn" onclick="retry()">
+            다시 테스트하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 화면: 젠이츠 -->
+    <div id="resultZenitsu" class="screen result-screen zenitsu">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="result-card">
+          <img src="젠이츠.webp" alt="젠이츠" class="character-image" />
+          <div class="result-header">
+            <span class="user-name-highlight" id="userNameZenitsu"></span>님의
+            스트레스 타입은
+          </div>
+          <div class="character-name">젠이츠 타입</div>
+          <div class="character-tagline">
+            불안과 걱정이 많고, 감정 기복이 큰 감정 민감형 스트레스 타입
+          </div>
+          <div class="aroma-badge">
+            <span>🌸</span>
+            <span>자스민 (Jasmine)</span>
+          </div>
+          <div class="aroma-type">감정 회복 · 우울감 완화</div>
+          <div class="result-description">
+            작은 일에도 걱정이 커지거나, 감정 기복이 심해지는 편인가요? 자스민
+            향은 위로가 필요한 마음을 부드럽게 감싸주는 향으로, 불안과 우울감이
+            섞여 있는 감정 상태에 잘 어울립니다. 젠이츠 타입의 당신은 겉으로는
+            가볍게 넘기는 것 같지만, 속으로는 생각이 많고 상처를 오래 안고 가는
+            편일 수 있어요. 자스민 향은 불안으로 꼬여 있는 감정을 조금 풀어주고,
+            다시 한 번 자신을 믿고 나아갈 수 있게 도와주는 정서 테라피 역할을
+            합니다.
+          </div>
+          <button class="button retry-btn" onclick="retry()">
+            다시 테스트하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 화면: 네즈코 -->
+    <div id="resultNezuko" class="screen result-screen nezuko">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="result-card">
+          <img src="네즈코.webp" alt="네즈코" class="character-image" />
+          <div class="result-header">
+            <span class="user-name-highlight" id="userNameNezuko"></span>님의
+            스트레스 타입은
+          </div>
+          <div class="character-name">네즈코 타입</div>
+          <div class="character-tagline">
+            몸과 마음이 동시에 지쳐 있는, 수면·휴식 회복형 스트레스 타입
+          </div>
+          <div class="aroma-badge">
+            <span>💤</span>
+            <span>라벤더 (Lavender)</span>
+          </div>
+          <div class="aroma-type">숙면 · 릴렉싱 · 스트레스 완화</div>
+          <div class="result-description">
+            머리도 마음도 바쁜데, 정작 가장 부족한 건 '제대로 쉬는 시간'일 수
+            있어요. 라벤더 향은 긴장된 신경을 완화하고, 깊은 수면을 돕는
+            대표적인 릴렉싱 향입니다. 네즈코 타입인 당신은 바쁘게 하루를
+            보내면서도 나를 위한 회복 시간은 미루는 경향이 있을 수 있어요.
+            잠들기 전, 침대 근처에 라벤더 향을 은은하게 사용해보세요. 지친
+            신경이 차분히 가라앉고, 스트레스에 소모되는 에너지를 '회복'으로
+            돌려줄 수 있습니다.
+          </div>
+          <button class="button retry-btn" onclick="retry()">
+            다시 테스트하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 화면: 이노스케 -->
+    <div id="resultInosuke" class="screen result-screen inosuke">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="result-card">
+          <img src="이노스케.webp" alt="이노스케" class="character-image" />
+          <div class="result-header">
+            <span class="user-name-highlight" id="userNameInosuke"></span>님의
+            스트레스 타입은
+          </div>
+          <div class="character-name">이노스케 타입</div>
+          <div class="character-tagline">
+            스트레스를 에너지로 태워버리는, 활동·액티브형 스트레스 타입
+          </div>
+          <div class="aroma-badge">
+            <span>🍋</span>
+            <span>레몬 (Lemon)</span>
+          </div>
+          <div class="aroma-type">기분 전환 · 활력 충전</div>
+          <div class="result-description">
+            스트레스를 받으면 오히려 몸을 더 움직이고 싶어지거나, 한 번에
+            에너지를 쏟아내는 스타일인가요? 레몬 향은 머리를 상큼하게 깨우고,
+            무거워진 기분에 활력을 넣어주는 향입니다. 이노스케 타입의 당신은
+            가만히 있기보다는, 무엇인가를 하면서 스트레스를 풀 때 더 시원함을
+            느끼는 편일 수 있어요. 아침에 레몬 계열 향을 사용하면 하루의
+            스타트를 더 가볍고 경쾌하게 시작할 수 있고, 오후 늘어지는 시간에도
+            기분 전환용 으로 잘 어울립니다.
+          </div>
+          <button class="button retry-btn" onclick="retry()">
+            다시 테스트하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 화면: 미츠리 -->
+    <div id="resultMitsuri" class="screen result-screen mitsuri">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="result-card">
+          <img src="미츠리.webp" alt="미츠리" class="character-image" />
+          <div class="result-header">
+            <span class="user-name-highlight" id="userNameMitsuri"></span>님의
+            스트레스 타입은
+          </div>
+          <div class="character-name">미츠리 타입</div>
+          <div class="character-tagline">
+            마음이 따뜻하지만, 쉽게 지치고 소진되는 힐링 필요형 스트레스 타입
+          </div>
+          <div class="aroma-badge">
+            <span>🌲</span>
+            <span>히노끼 (Hinoki)</span>
+          </div>
+          <div class="aroma-type">휴식 · 힐링 · 스파 감성</div>
+          <div class="result-description">
+            남을 많이 챙기고, 주변을 살피다 보니 정작 나 자신을 돌보는 시간은
+            부족하지 않나요? 히노끼 향은 편백나무의 편안한 숲 내음을 담고 있어,
+            마음을 차분하게 가라앉히고 깊은 휴식을 돕는 향입니다. 미츠리 타입인
+            당신은 따뜻한 마음만큼 쉽게 지치고 번아웃을 느끼기 쉬운 사람일 수
+            있어요. 샤워 후, 자기 전, 혹은 조용한 시간에 히노끼 향을 켜두면 마치
+            작은 홈스파에 온 듯한 힐링 효과를 느낄 수 있습니다.
+          </div>
+          <button class="button retry-btn" onclick="retry()">
+            다시 테스트하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 화면: 기유 -->
+    <div id="resultGiyu" class="screen result-screen giyu">
+      <div class="overlay"></div>
+      <div class="content">
+        <div class="result-card">
+          <img src="기유.webp" alt="기유" class="character-image" />
+          <div class="result-header">
+            <span class="user-name-highlight" id="userNameGiyu"></span>님의
+            스트레스 타입은
+          </div>
+          <div class="character-name">기유 타입</div>
+          <div class="character-tagline">
+            멍해진 정신을 깨우고 싶은, 클리어 타입 스트레스 패턴
+          </div>
+          <div class="aroma-badge">
+            <span>❄️</span>
+            <span>페퍼민트 (Peppermint)</span>
+          </div>
+          <div class="aroma-type">즉각 각성 · 정신 맑게 하기</div>
+          <div class="result-description">
+            몸은 버티고 있지만, 머리가 자주 멍해지고 정신이 또렷하지 않은 느낌이
+            드나요? 페퍼민트 향은 시원한 멘톨감으로 머리를 빠르게 깨워주고,
+            두통이나 피로감이 몰려올 때 즉각적인 각성을 돕는 향입니다. 기유
+            타입의 당신은 속으로는 많은 생각을 하고 있지만, 겉으로는 표현이 적고
+            묵묵히 버티는 스타일일 수 있어요. 중요한 순간, 또렷한 판단이 필요한
+            상황에서 페퍼민트 계열 향은 정신을 맑게 만들어주는 테라피가 되어 줄
+            거예요.
+          </div>
+          <button class="button retry-btn" onclick="retry()">
+            다시 테스트하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const questions = [
+        {
+          text: "지금 내 스트레스 상태와 가장 가까운 것을 고르자면?",
+          weight: 2,
+          answers: [
+            { text: "A. 집중이 잘 안 된다", character: "tanjiro" },
+            { text: "B. 감정기복이 심하다", character: "zenitsu" },
+            { text: "C. 잠이 잘 안 온다", character: "nezuko" },
+            { text: "D. 기력이 없다", character: "inosuke" },
+            { text: "E. 그냥 쉬고 싶다", character: "mitsuri" },
+            { text: "F. 머리가 멍하고 각성이 안 된다", character: "giyu" },
+          ],
+        },
+        {
+          text: "하루 중 가장 힘든 순간은?",
+          weight: 1,
+          answers: [
+            { text: "A. 작업/공부할 때 집중 유지", character: "tanjiro" },
+            {
+              text: "B. 사람들과 대화·관계 유지",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 잠자리에 누웠을 때 잠이 안 올 때",
+              character: "nezuko",
+            },
+            {
+              text: "D. 오전·오후에 체력이 떨어질 때",
+              character: "inosuke",
+            },
+            {
+              text: "E. 집에 와서도 머리가 쉬지 않을 때",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 급한 일이 생겼을 때 머리가 하얘질 때",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "스트레스가 쌓이면 나는?",
+          weight: 1,
+          answers: [
+            {
+              text: "A. 해야 할 일에 집중이 안 된다",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 예민해지거나 작은 일에도 불안해진다",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 잠이 얕아지고 쉽게 깬다",
+              character: "nezuko",
+            },
+            {
+              text: "D. 아무것도 하기 싫고 늘어지게 된다",
+              character: "inosuke",
+            },
+            {
+              text: "E. 사람을 피하고 혼자 있고 싶어진다",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 생각이 너무 많아서 머리가 복잡해진다",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "스트레스를 줄이기 위해 지금 가장 필요한 것은?",
+          weight: 1,
+          answers: [
+            {
+              text: "A. 확실한 집중력과 몰입",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 마음의 안정과 위로",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 푹 잘 수 있는 깊은 잠",
+              character: "nezuko",
+            },
+            {
+              text: "D. 상큼한 활력과 에너지",
+              character: "inosuke",
+            },
+            {
+              text: "E. 조용한 힐링 타임",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 정신이 맑아지는 시원한 각성",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "평소 가장 자주 겪는 상태는?",
+          weight: 2,
+          answers: [
+            {
+              text: "A. 장기 집중이 잘 안 된다",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 감정 변화가 잦다",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 스트레스 때문에 잠이 자주 방해받는다",
+              character: "nezuko",
+            },
+            {
+              text: "D. 활력이 쉽게 떨어진다",
+              character: "inosuke",
+            },
+            {
+              text: "E. 이유 없이 피곤하고 지친 느낌이다",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 머리가 자주 멍해지고 판단이 느려진다",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "요즘 가장 많이 드는 생각은?",
+          weight: 1,
+          answers: [
+            {
+              text: "A. 해야 할 일은 많은데 집중이 안 된다",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 별일 아닌데도 감정이 많이 흔들린다",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 오늘도 잠이 잘 올까 걱정된다",
+              character: "nezuko",
+            },
+            {
+              text: "D. 요즘 유난히 몸이 무겁고 피곤하다",
+              character: "inosuke",
+            },
+            {
+              text: "E. 그냥 아무것도 안 하고 쉬고 싶다",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 머릿속이 항상 복잡하게 돌아가는 느낌이다",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "스트레스가 심할 때 가장 먼저 떠오르는 해결 방법은?",
+          weight: 1,
+          answers: [
+            {
+              text: "A. 해야 할 일을 정리하고 다시 집중한다",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 누군가와 이야기하며 감정을 풀어낸다",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 따뜻하게 씻고 일찍 눕는다",
+              character: "nezuko",
+            },
+            {
+              text: "D. 산책하거나 몸을 움직여 기분을 전환한다",
+              character: "inosuke",
+            },
+            {
+              text: "E. 조용한 공간에서 혼자만의 시간을 가진다",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 찬물로 세수하거나 머리를 식힌다",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "쉬는 날, 스트레스를 풀고 싶을 때 나는?",
+          weight: 1,
+          answers: [
+            {
+              text: "A. 카페나 도서관에서 조용히 할 일을 한다",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 감정 정리 겸 일기 쓰기·생각 정리를 한다",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 낮잠 자거나 침대에서 뒹굴거리며 쉰다",
+              character: "nezuko",
+            },
+            {
+              text: "D. 액티비티, 운동, 밖으로 나가는 편이다",
+              character: "inosuke",
+            },
+            {
+              text: "E. 반신욕·샤워·홈스파 같은 걸 즐긴다",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 머리를 비우고 멍 때리는 시간을 가진다",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "요즘 내 컨디션을 한 줄로 표현한다면?",
+          weight: 1,
+          answers: [
+            {
+              text: "A. 해야 할 건 많지만 집중이 잘 안 되는 상태",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 마음이 예민하고 쉽게 흔들리는 상태",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 잠과 휴식이 항상 부족한 상태",
+              character: "nezuko",
+            },
+            {
+              text: "D. 체력·기운이 쉽게 바닥나는 상태",
+              character: "inosuke",
+            },
+            {
+              text: "E. 정신적으로 번아웃에 가까운 상태",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 머리가 뿌옇고 맑게 돌아가지 않는 상태",
+              character: "giyu",
+            },
+          ],
+        },
+        {
+          text: "지금 이 순간 가장 빨리 해결하고 싶은 스트레스는?",
+          weight: 2,
+          answers: [
+            {
+              text: "A. 해야 할 일을 제대로 끝내지 못하는 것",
+              character: "tanjiro",
+            },
+            {
+              text: "B. 불안·걱정·감정 기복이 심한 것",
+              character: "zenitsu",
+            },
+            {
+              text: "C. 잠을 잘 못 자고 피로가 계속 쌓이는 것",
+              character: "nezuko",
+            },
+            {
+              text: "D. 쉽게 지치고 기운이 빨리 떨어지는 것",
+              character: "inosuke",
+            },
+            {
+              text: "E. 머리와 마음이 전반적으로 지쳐 있는 것",
+              character: "mitsuri",
+            },
+            {
+              text: "F. 머리가 맑지 않고 항상 멍한 상태인 것",
+              character: "giyu",
+            },
+          ],
+        },
+      ];
+
+      let currentQuestion = 0;
+      let userName = "";
+      let scores = {
+        tanjiro: 0,
+        nezuko: 0,
+        inosuke: 0,
+        mitsuri: 0,
+        zenitsu: 0,
+        giyu: 0,
+      };
+
+      function showScreen(screenId) {
+        const screens = document.querySelectorAll(".screen");
+        screens.forEach((screen) => screen.classList.remove("active"));
+        document.getElementById(screenId).classList.add("active");
+      }
+
+      function startQuiz() {
+        const nameInput = document.getElementById("userName").value.trim();
+        if (!nameInput) {
+          alert("이름을 입력해 주세요.");
+          return;
+        }
+        userName = nameInput;
+        currentQuestion = 0;
+        for (let key in scores) {
+          scores[key] = 0;
+        }
+        showScreen("questionScreen");
+        displayQuestion();
+      }
+
+      function displayQuestion() {
+        const question = questions[currentQuestion];
+        const questionText = document.getElementById("questionText");
+        const answersContainer = document.getElementById("answersContainer");
+        const questionProgress = document.getElementById("questionProgress");
+        const progressBar = document.getElementById("progressBar");
+
+        questionText.textContent = question.text;
+        questionProgress.textContent = `Q${currentQuestion + 1} / ${
+          questions.length
+        }`;
+
+        const progressPercent =
+          ((currentQuestion + 1) / questions.length) * 100;
+        progressBar.style.width = progressPercent + "%";
+
+        answersContainer.innerHTML = "";
+        question.answers.forEach((answer) => {
+          const btn = document.createElement("button");
+          btn.className = "answer-btn";
+          const labelSpan = document.createElement("span");
+          labelSpan.className = "answer-btn-label";
+          labelSpan.textContent = answer.text.slice(0, 2);
+          const textSpan = document.createElement("span");
+          textSpan.className = "answer-btn-text";
+          textSpan.textContent = answer.text.slice(3);
+          btn.appendChild(labelSpan);
+          btn.appendChild(textSpan);
+
+          btn.onclick = () => answerQuestion(answer.character);
+          answersContainer.appendChild(btn);
+        });
+      }
+
+      function answerQuestion(character) {
+        const weight = questions[currentQuestion].weight || 1;
+        scores[character] += weight;
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          displayQuestion();
+        } else {
+          showResult();
+        }
+      }
+
+      function showResult() {
+        const maxScore = Math.max(...Object.values(scores));
+        const candidates = Object.entries(scores)
+          .filter(([_, v]) => v === maxScore)
+          .map(([k]) => k);
+        const resultCharacter =
+          candidates[Math.floor(Math.random() * candidates.length)];
+
+        const resultScreenId =
+          "result" +
+          resultCharacter.charAt(0).toUpperCase() +
+          resultCharacter.slice(1);
+        const userSpanId =
+          "userName" +
+          resultCharacter.charAt(0).toUpperCase() +
+          resultCharacter.slice(1);
+
+        showScreen(resultScreenId);
+        const userSpan = document.getElementById(userSpanId);
+        if (userSpan) {
+          userSpan.textContent = userName;
+        }
+      }
+
+      function retry() {
+        currentQuestion = 0;
+        scores = {
+          tanjiro: 0,
+          nezuko: 0,
+          inosuke: 0,
+          mitsuri: 0,
+          zenitsu: 0,
+          giyu: 0,
+        };
+        userName = "";
+        document.getElementById("userName").value = "";
+        showScreen("startScreen");
+      }
+    </script>
+  </body>
+</html>
