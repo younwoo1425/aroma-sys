@@ -1083,10 +1083,59 @@
       }
 
       function showResult() {
+        // 기유를 제외한 캐릭터 목록
+        const availableCharacters = [
+          "tanjiro",
+          "nezuko",
+          "inosuke",
+          "mitsuri",
+          "zenitsu",
+        ];
+
+        // 최고 점수 찾기
         const maxScore = Math.max(...Object.values(scores));
-        const candidates = Object.entries(scores)
+
+        // 최고 점수를 가진 후보들
+        let candidates = Object.entries(scores)
           .filter(([_, v]) => v === maxScore)
           .map(([k]) => k);
+
+        // 후보에 기유가 포함되어 있는지 확인
+        const hasGiyu = candidates.includes("giyu");
+
+        if (hasGiyu) {
+          // 기유를 제외한 후보들
+          const candidatesWithoutGiyu = candidates.filter(
+            (char) => char !== "giyu"
+          );
+
+          if (candidatesWithoutGiyu.length > 0) {
+            // 경우 2: 기유와 다른 캐릭터가 동점 -> 기유 제외한 동점 캐릭터 중 선택
+            candidates = candidatesWithoutGiyu;
+          } else {
+            // 경우 1 또는 3: 기유만 최고점수
+            // 기유를 제외한 점수들 중에서 다음 최고 점수 찾기
+            const scoresWithoutGiyu = Object.entries(scores)
+              .filter(([k]) => k !== "giyu")
+              .map(([_, v]) => v);
+
+            const nextMaxScore = Math.max(...scoresWithoutGiyu);
+
+            // 다음 최고 점수를 가진 캐릭터들
+            const nextCandidates = Object.entries(scores)
+              .filter(([k, v]) => k !== "giyu" && v === nextMaxScore)
+              .map(([k]) => k);
+
+            if (nextCandidates.length > 0) {
+              // 경우 1: 다음 최고 점수 캐릭터 선택
+              candidates = nextCandidates;
+            } else {
+              // 경우 3: 혹시 모를 예외 상황 -> 5개 캐릭터 중 랜덤
+              candidates = availableCharacters;
+            }
+          }
+        }
+
         const resultCharacter =
           candidates[Math.floor(Math.random() * candidates.length)];
 
