@@ -473,7 +473,6 @@
     </style>
   </head>
   <body>
-    <!-- 시작 화면 -->
     <div id="startScreen" class="screen active">
       <div class="overlay"></div>
       <div class="content">
@@ -495,7 +494,6 @@
       </div>
     </div>
 
-    <!-- 질문 화면 -->
     <div id="questionScreen" class="screen">
       <div class="overlay"></div>
       <div class="content">
@@ -513,7 +511,6 @@
       </div>
     </div>
 
-    <!-- 결과 화면: 탄지로 -->
     <div id="resultTanjiro" class="screen result-screen tanjiro">
       <div class="overlay"></div>
       <div class="content">
@@ -548,7 +545,6 @@
       </div>
     </div>
 
-    <!-- 결과 화면: 젠이츠 -->
     <div id="resultZenitsu" class="screen result-screen zenitsu">
       <div class="overlay"></div>
       <div class="content">
@@ -583,7 +579,6 @@
       </div>
     </div>
 
-    <!-- 결과 화면: 네즈코 -->
     <div id="resultNezuko" class="screen result-screen nezuko">
       <div class="overlay"></div>
       <div class="content">
@@ -618,7 +613,6 @@
       </div>
     </div>
 
-    <!-- 결과 화면: 이노스케 -->
     <div id="resultInosuke" class="screen result-screen inosuke">
       <div class="overlay"></div>
       <div class="content">
@@ -653,7 +647,6 @@
       </div>
     </div>
 
-    <!-- 결과 화면: 미츠리 -->
     <div id="resultMitsuri" class="screen result-screen mitsuri">
       <div class="overlay"></div>
       <div class="content">
@@ -687,7 +680,6 @@
       </div>
     </div>
 
-    <!-- 결과 화면: 기유 -->
     <div id="resultGiyu" class="screen result-screen giyu">
       <div class="overlay"></div>
       <div class="content">
@@ -1083,59 +1075,65 @@
       }
 
       function showResult() {
-        // 기유를 제외한 캐릭터 목록
-        const availableCharacters = [
-          "tanjiro",
-          "nezuko",
-          "inosuke",
-          "mitsuri",
-          "zenitsu",
-        ];
+        // **제외할 캐릭터 목록**
+        const excludedCharacters = ["giyu", "mitsuri", "inosuke"];
 
         // 최고 점수 찾기
         const maxScore = Math.max(...Object.values(scores));
 
-        // 최고 점수를 가진 후보들
+        // 최고 점수를 가진 모든 후보들
         let candidates = Object.entries(scores)
           .filter(([_, v]) => v === maxScore)
           .map(([k]) => k);
 
-        // 후보에 기유가 포함되어 있는지 확인
-        const hasGiyu = candidates.includes("giyu");
+        // **제외할 캐릭터들이 최고 점수 후보에 포함되어 있는지 확인**
+        const hasExcluded = candidates.some((char) =>
+          excludedCharacters.includes(char)
+        );
 
-        if (hasGiyu) {
-          // 기유를 제외한 후보들
-          const candidatesWithoutGiyu = candidates.filter(
-            (char) => char !== "giyu"
+        if (hasExcluded) {
+          // 제외할 캐릭터들을 뺀 나머지 후보들
+          let candidatesWithoutExcluded = candidates.filter(
+            (char) => !excludedCharacters.includes(char)
           );
 
-          if (candidatesWithoutGiyu.length > 0) {
-            // 경우 2: 기유와 다른 캐릭터가 동점 -> 기유 제외한 동점 캐릭터 중 선택
-            candidates = candidatesWithoutGiyu;
+          if (candidatesWithoutExcluded.length > 0) {
+            // 경우 1: 제외 캐릭터와 다른 캐릭터가 동점 -> 제외 캐릭터를 뺀 동점 캐릭터들 중 선택
+            candidates = candidatesWithoutExcluded;
           } else {
-            // 경우 1 또는 3: 기유만 최고점수
-            // 기유를 제외한 점수들 중에서 다음 최고 점수 찾기
-            const scoresWithoutGiyu = Object.entries(scores)
-              .filter(([k]) => k !== "giyu")
+            // 경우 2: 제외 캐릭터들만 최고점수인 경우
+
+            // 제외 캐릭터들을 제외한 점수들 중에서 다음 최고 점수 찾기
+            const scoresWithoutExcluded = Object.entries(scores)
+              .filter(([k]) => !excludedCharacters.includes(k))
               .map(([_, v]) => v);
 
-            const nextMaxScore = Math.max(...scoresWithoutGiyu);
-
-            // 다음 최고 점수를 가진 캐릭터들
-            const nextCandidates = Object.entries(scores)
-              .filter(([k, v]) => k !== "giyu" && v === nextMaxScore)
-              .map(([k]) => k);
-
-            if (nextCandidates.length > 0) {
-              // 경우 1: 다음 최고 점수 캐릭터 선택
-              candidates = nextCandidates;
+            // 만약 유효한 점수가 없다면 (모든 점수가 0이라면) 기본 후보군으로 설정
+            if (scoresWithoutExcluded.length === 0) {
+              candidates = ["tanjiro", "nezuko", "zenitsu"];
             } else {
-              // 경우 3: 혹시 모를 예외 상황 -> 5개 캐릭터 중 랜덤
-              candidates = availableCharacters;
+              const nextMaxScore = Math.max(...scoresWithoutExcluded);
+
+              // 다음 최고 점수를 가진 캐릭터들 (제외되지 않은 캐릭터 중에서)
+              const nextCandidates = Object.entries(scores)
+                .filter(
+                  ([k, v]) =>
+                    !excludedCharacters.includes(k) && v === nextMaxScore
+                )
+                .map(([k]) => k);
+
+              if (nextCandidates.length > 0) {
+                // 다음 최고 점수 캐릭터 선택
+                candidates = nextCandidates;
+              } else {
+                // 예외 상황 (이론적으로 발생하지 않아야 함) -> 기본 후보군 중 랜덤
+                candidates = ["tanjiro", "nezuko", "zenitsu"];
+              }
             }
           }
         }
 
+        // 최종 결과 캐릭터 선택 (동점자 중 랜덤 선택)
         const resultCharacter =
           candidates[Math.floor(Math.random() * candidates.length)];
 
